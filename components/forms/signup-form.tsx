@@ -28,6 +28,7 @@ import { useState } from "react";
 import { toast } from "sonner";
 import { Eye, EyeOff, Loader2 } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { authClient } from "@/lib/auth-client";
 
 const formSchema = z.object({
@@ -216,11 +217,21 @@ export function SignupForm({
                   </Button>
                   <Button
                     variant="outline"
-                    className="w-full"
+                    className="w-full gap-2"
                     onClick={signUp}
                     type="button"
                   >
-                    Sign up with Google
+                    <div className="flex items-center justify-center w-4 h-4">
+                      <Image
+                        src="/google-icon-logo-svgrepo-com.svg"
+                        alt="Google"
+                        width={14}
+                        height={14}
+                        className="w-3.5 h-3.5"
+                        aria-hidden="true"
+                      />
+                    </div>
+                    <span>Sign up with Google</span>
                   </Button>
                 </div>
               </div>
