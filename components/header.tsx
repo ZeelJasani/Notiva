@@ -9,7 +9,7 @@ import { useScroll } from 'motion/react'
 import { ModeToggle } from './theme-toggle'
 
 const menuItems = [
-    { name: 'Features', href: '#link' },
+    { name: 'Features', href: '' },
     { name: 'Solution', href: '#link' },
     { name: 'Pricing', href: '#link' },
     { name: 'About', href: '#link' },
@@ -86,14 +86,14 @@ export const HeroHeader = () => {
                                     asChild
                                     variant="outline"
                                     size="sm">
-                                    <Link href="#">
+                                    <Link href="/login">
                                         <span>Login</span>
                                     </Link>
                                 </Button>
                                 <Button
                                     asChild
                                     size="sm">
-                                    <Link href="#">
+                                    <Link href="/signup">
                                         <span>Sign Up</span>
                                     </Link>
                                 </Button>
