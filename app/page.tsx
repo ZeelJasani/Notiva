@@ -12,7 +12,9 @@ export default function Home() {
     <main>
       <HeroHeader />
       <HeroSection />
-      <Features />
+      <section className="py-16 md:py-24">
+        <Features />
+      </section>
       <LogoCloud />
       <CallToAction />
       <FooterSection />
