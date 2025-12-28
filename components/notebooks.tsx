@@ -1,18 +1,3 @@
-// import { Logout } from "@/components/logout";
-// import { PageWrapper } from "@/components/page-wrapper";
-
-// export default function Page() {
-//     return (
-//         <PageWrapper breadcrumbs={[{ label: "Notiva", href: "/dashboard" }]}>
-//             <div>Dashboard Home Page</div>
-//         </PageWrapper>
-//     )
-// }
-
-
-
-
-
 import { CreateNotebookButton } from "@/components/create-notebook-button";
 import NotebookCard from "@/components/notebook-card";
 import { PageWrapper } from "@/components/page-wrapper";

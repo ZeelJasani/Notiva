@@ -90,7 +90,7 @@ export default function HeroSection() {
                                         key={2}
                                         asChild
                                         size="lg"
-                                        variant="ghost"
+                                        variant="outline"
                                         className="h-10.5 rounded-xl px-5 text-base">
                                         <Link href="#link">
                                             <span className="text-nowrap">Request a demo</span>

@@ -125,27 +125,11 @@
   }
 }
 
-
-
-
 /* ::view-transition-old(root),
 ::view-transition-new(root) {
   animation: none;
   mix-blend-mode: normal;
 } */
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 @import "tailwindcss";
 @import "tw-animate-css";
