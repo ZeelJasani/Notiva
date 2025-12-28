@@ -103,7 +103,7 @@ export function ResetPasswordForm({
                         <FormControl>
                           <Input
                             type="password"
-                            placeholder="********"
+                            placeholder="Enter your new password"
                             {...field}
                           />
                         </FormControl>
@@ -122,7 +122,7 @@ export function ResetPasswordForm({
                         <FormControl>
                           <Input
                             type="password"
-                            placeholder="********"
+                            placeholder="Enter your confirm password"
                             {...field}
                           />
                         </FormControl>

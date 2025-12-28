@@ -1,3 +1,4 @@
+import Features from "@/components/features";
 import { Logout } from "@/components/logout";
 
 export default function Page() {
@@ -5,6 +6,7 @@ export default function Page() {
         <div>
             <h1>Dashboard</h1>
             <Logout />
+            <Features/>
         </div>
     )
 }
