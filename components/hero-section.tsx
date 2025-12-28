@@ -88,20 +88,20 @@ export default function HeroSection() {
                   <Button
                     asChild
                     size="lg"
+                    variant="outline"
                     className="h-12 rounded-xl px-8 text-base font-semibold"
                   >
-                    <Link href="/register" className="flex items-center gap-2">
-                      Start Writing <ArrowRight size={18} />
-                    </Link>
+                    <Link href="/login">Sign In</Link>
                   </Button>
 
                   <Button
                     asChild
                     size="lg"
-                    variant="outline"
                     className="h-12 rounded-xl px-8 text-base font-semibold"
                   >
-                    <Link href="/login">Sign In</Link>
+                    <Link href="/register" className="flex items-center gap-2">
+                      Start Writing <ArrowRight size={12} />
+                    </Link>
                   </Button>
                 </AnimatedGroup>
 
