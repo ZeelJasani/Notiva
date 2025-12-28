@@ -33,9 +33,10 @@ const formSchema = z.object({
 
 interface CreateNoteButtonProps {
   notebookId: string;
+  parentId?: string;
 }
 
-export const CreateNoteButton = ({ notebookId }: CreateNoteButtonProps) => {
+export const CreateNoteButton = ({ notebookId, parentId }: CreateNoteButtonProps) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -55,6 +56,7 @@ export const CreateNoteButton = ({ notebookId }: CreateNoteButtonProps) => {
       const response = await createNote({
         title: values.title,
         notebookId,
+        parentId,
         content: [
           {
             type: "paragraph",
@@ -81,9 +83,9 @@ export const CreateNoteButton = ({ notebookId }: CreateNoteButtonProps) => {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-max">
+        <Button className="w-max" variant={parentId ? "outline" : "default"}>
           <Plus className="mr-2 h-4 w-4" />
-          Create Note
+          {parentId ? "Create Sub-page" : "Create Note"}
         </Button>
       </DialogTrigger>
       <DialogContent>

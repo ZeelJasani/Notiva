@@ -41,8 +41,19 @@ import {
     CloudUpload,
     CloudOff,
     Loader2,
+    Quote,
 } from "lucide-react";
 import { updateNote } from "@/server/notes";
+import { CodeBlockLowlight } from "@tiptap/extension-code-block-lowlight";
+import { TaskList } from "@tiptap/extension-task-list";
+import { TaskItem } from "@tiptap/extension-task-item";
+import { Underline as TiptapUnderline } from "@tiptap/extension-underline";
+import { Link as TiptapLink } from "@tiptap/extension-link";
+import { Commands } from "./editor/slash-command";
+import { common, createLowlight } from "lowlight";
+import { suggestion as slashCommandSuggestion } from "./editor/suggestion";
+
+const lowlight = createLowlight(common);
 
 interface RichTextEditorProps {
     content?: JSONContent;
@@ -55,7 +66,41 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
     const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
 
     const editor = useEditor({
-        extensions: [StarterKit, Document, Paragraph, Text],
+        extensions: [
+            StarterKit.configure({
+                codeBlock: false,
+            }),
+            Document,
+            Paragraph,
+            Text,
+            TiptapUnderline,
+            TiptapLink.configure({
+                openOnClick: false,
+                HTMLAttributes: {
+                    class: "text-primary underline underline-offset-4 cursor-pointer",
+                },
+            }),
+            TaskList.configure({
+                HTMLAttributes: {
+                    class: "not-prose pl-2",
+                },
+            }),
+            TaskItem.configure({
+                nested: true,
+                HTMLAttributes: {
+                    class: "flex gap-2 items-start my-4",
+                },
+            }),
+            CodeBlockLowlight.configure({
+                lowlight,
+            }),
+            Commands.configure({
+                suggestion: {
+                    ...slashCommandSuggestion,
+                    char: "/",
+                },
+            }),
+        ],
         immediatelyRender: false,
         autofocus: true,
         editable: true,
@@ -119,6 +164,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                 isHeading3: ctx.editor?.isActive("heading", { level: 3 }),
                 isBulletList: ctx.editor?.isActive("bulletList"),
                 isOrderedList: ctx.editor?.isActive("orderedList"),
+                isTaskList: ctx.editor?.isActive("taskList"),
                 isCodeBlock: ctx.editor?.isActive("codeBlock"),
                 isBlockquote: ctx.editor?.isActive("blockquote"),
                 canUndo: ctx.editor?.can().chain().focus().undo().run(),
@@ -229,6 +275,17 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                 >
                     <ListOrdered className="h-4 w-4" />
                 </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor?.chain().focus().toggleTaskList().run()}
+                    className={`size-8 p-0 hover:bg-accent ${editorState?.isTaskList
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                        }`}
+                >
+                    <CheckCircle2 className="h-4 w-4" />
+                </Button>
 
                 <div className="w-px h-6 bg-border mx-1" />
 
@@ -284,9 +341,35 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+                    onClick={() => editor?.chain().focus().toggleUnderline().run()}
+                    className={`size-8 p-0 hover:bg-accent ${editor?.isActive("underline")
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                        }`}
                 >
                     <Underline className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor?.chain().focus().toggleBlockquote().run()}
+                    className={`size-8 p-0 hover:bg-accent ${editorState?.isBlockquote
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                        }`}
+                >
+                    <Quote className="h-4 w-4" />
+                </Button>
+                <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => editor?.chain().focus().toggleCodeBlock().run()}
+                    className={`size-8 p-0 hover:bg-accent ${editorState?.isCodeBlock
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                        }`}
+                >
+                    <Code className="h-4 w-4" />
                 </Button>
 
                 <div className="w-px h-6 bg-border mx-1" />
@@ -295,7 +378,16 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                 <Button
                     variant="ghost"
                     size="sm"
-                    className="size-8 p-0 text-muted-foreground hover:text-foreground hover:bg-accent"
+                    onClick={() => {
+                        const url = window.prompt("Enter URL");
+                        if (url) {
+                            editor?.chain().focus().setLink({ href: url }).run();
+                        }
+                    }}
+                    className={`size-8 p-0 hover:bg-accent ${editor?.isActive("link")
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
+                        }`}
                 >
                     <Link className="h-4 w-4" />
                 </Button>
@@ -393,7 +485,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
             <div className="min-h-96 p-6 bg-card">
                 <EditorContent
                     editor={editor}
-                    className="prose prose-neutral dark:prose-invert max-w-none focus:outline-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-96 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_p]:mb-4 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_code]:bg-muted [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded"
+                    className="prose prose-neutral dark:prose-invert max-w-none focus:outline-none [&_.ProseMirror]:focus:outline-none [&_.ProseMirror]:min-h-96 [&_.ProseMirror_h1]:text-3xl [&_.ProseMirror_h1]:font-bold [&_.ProseMirror_h1]:mb-4 [&_.ProseMirror_h2]:text-2xl [&_.ProseMirror_h2]:font-bold [&_.ProseMirror_h2]:mb-3 [&_.ProseMirror_p]:mb-4 [&_.ProseMirror_blockquote]:border-l-4 [&_.ProseMirror_blockquote]:border-border [&_.ProseMirror_blockquote]:pl-4 [&_.ProseMirror_blockquote]:italic [&_.ProseMirror_pre]:bg-muted [&_.ProseMirror_pre]:p-4 [&_.ProseMirror_pre]:rounded [&_.ProseMirror_pre]:overflow-x-auto [&_.ProseMirror_code]:bg-muted [&_.ProseMirror_code]:px-1 [&_.ProseMirror_code]:rounded [&_ul[data-type='taskList']]:list-none [&_ul[data-type='taskList']]:pl-2"
                 />
             </div>
         </div>

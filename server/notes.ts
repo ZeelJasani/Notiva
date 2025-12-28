@@ -20,7 +20,8 @@ export const getNoteById = async (id: string) => {
         const note = await db.query.notes.findFirst({
             where: eq(notes.id, id),
             with: {
-                notebook: true
+                notebook: true,
+                children: true
             }
         });
 
