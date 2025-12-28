@@ -6,6 +6,7 @@ import {
     useEditorState,
     type JSONContent,
 } from "@tiptap/react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import StarterKit from "@tiptap/starter-kit";
 import Document from "@tiptap/extension-document";
 import Paragraph from "@tiptap/extension-paragraph";
@@ -36,6 +37,10 @@ import {
     ChevronDown,
     Superscript,
     Subscript,
+    CheckCircle2,
+    CloudUpload,
+    CloudOff,
+    Loader2,
 } from "lucide-react";
 import { updateNote } from "@/server/notes";
 
@@ -45,6 +50,10 @@ interface RichTextEditorProps {
 }
 
 const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
+    const timerRef = useRef<NodeJS.Timeout>(null);
+    const [isPending, startTransition] = useTransition();
+    const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved" | "error">("idle");
+
     const editor = useEditor({
         extensions: [StarterKit, Document, Paragraph, Text],
         immediatelyRender: false,
@@ -53,79 +62,39 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         injectCSS: false,
         onUpdate: ({ editor }) => {
             if (noteId) {
+                setSaveStatus("saving");
+                if (timerRef.current) clearTimeout(timerRef.current);
+
                 const content = editor.getJSON();
-                updateNote(noteId, { content });
+                timerRef.current = setTimeout(() => {
+                    startTransition(async () => {
+                        try {
+                            const result = await updateNote(noteId, { content });
+                            if (result.success) {
+                                setSaveStatus("saved");
+                                // Reset to idle after a while
+                                setTimeout(() => setSaveStatus("idle"), 2000);
+                            } else {
+                                setSaveStatus("error");
+                            }
+                        } catch {
+                            setSaveStatus("error");
+                        }
+                    });
+                }, 500); // 500ms for real-time feel
             }
         },
         content: content ?? {
             type: "doc",
-            content: [
-                {
-                    type: "heading",
-                    attrs: { level: 1 },
-                    content: [{ type: "text", text: "Getting started" }],
-                },
-                {
-                    type: "paragraph",
-                    content: [
-                        { type: "text", text: "Welcome to the " },
-                        {
-                            type: "text",
-                            text: "Simple Editor",
-                            marks: [{ type: "italic" }],
-                        },
-                        { type: "text", text: " template! This template integrates " },
-                        { type: "text", text: "open source", marks: [{ type: "bold" }] },
-                        {
-                            type: "text",
-                            text: " UI components and Tiptap extensions licensed under ",
-                        },
-                        { type: "text", text: "MIT", marks: [{ type: "bold" }] },
-                        { type: "text", text: "." },
-                    ],
-                },
-                {
-                    type: "paragraph",
-                    content: [
-                        { type: "text", text: "Integrate it by following the " },
-                        {
-                            type: "text",
-                            text: "Tiptap UI Components docs",
-                            marks: [{ type: "code" }],
-                        },
-                        { type: "text", text: " or using our CLI tool." },
-                    ],
-                },
-                {
-                    type: "codeBlock",
-                    content: [{ type: "text", text: "npx @tiptap/cli init" }],
-                },
-                {
-                    type: "heading",
-                    attrs: { level: 2 },
-                    content: [{ type: "text", text: "Features" }],
-                },
-                {
-                    type: "blockquote",
-                    content: [
-                        {
-                            type: "paragraph",
-                            content: [
-                                {
-                                    type: "text",
-                                    text: "A fully responsive rich text editor with built-in support for common formatting and layout tools. Type markdown ",
-                                },
-                                { type: "text", text: "**", marks: [{ type: "bold" }] },
-                                { type: "text", text: " or use keyboard shortcuts " },
-                                { type: "text", text: "⌘+B", marks: [{ type: "code" }] },
-                                { type: "text", text: " for most all common markdown marks." },
-                            ],
-                        },
-                    ],
-                },
-            ],
+            content: [],
         },
     });
+
+    useEffect(() => {
+        return () => {
+            if (timerRef.current) clearTimeout(timerRef.current);
+        };
+    }, []);
 
     const editorState = useEditorState({
         editor,
@@ -239,8 +208,8 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                     size="sm"
                     onClick={() => editor?.chain().focus().toggleBulletList().run()}
                     className={`size-8 p-0 hover:bg-accent ${editorState?.isBulletList
-                            ? "bg-accent text-accent-foreground"
-                            : "text-muted-foreground hover:text-foreground"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     <List className="h-4 w-4" />
@@ -250,8 +219,8 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                     size="sm"
                     onClick={() => editor?.chain().focus().toggleOrderedList().run()}
                     className={`size-8 p-0 hover:bg-accent ${editorState?.isOrderedList
-                            ? "bg-accent text-accent-foreground"
-                            : "text-muted-foreground hover:text-foreground"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     <ListOrdered className="h-4 w-4" />
@@ -266,8 +235,8 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                     onClick={() => editor?.chain().focus().toggleBold().run()}
                     disabled={!editorState?.canBold}
                     className={`size-8 p-0 hover:bg-accent ${editorState?.isBold
-                            ? "bg-accent text-accent-foreground"
-                            : "text-muted-foreground hover:text-foreground"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     <Bold className="h-4 w-4" />
@@ -278,8 +247,8 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                     onClick={() => editor?.chain().focus().toggleItalic().run()}
                     disabled={!editorState?.canItalic}
                     className={`size-8 p-0 hover:bg-accent ${editorState?.isItalic
-                            ? "bg-accent text-accent-foreground"
-                            : "text-muted-foreground hover:text-foreground"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     <Italic className="h-4 w-4" />
@@ -290,8 +259,8 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                     onClick={() => editor?.chain().focus().toggleStrike().run()}
                     disabled={!editorState?.canStrike}
                     className={`size-8 p-0 hover:bg-accent ${editorState?.isStrike
-                            ? "bg-accent text-accent-foreground"
-                            : "text-muted-foreground hover:text-foreground"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     <Strikethrough className="h-4 w-4" />
@@ -302,8 +271,8 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                     onClick={() => editor?.chain().focus().toggleCode().run()}
                     disabled={!editorState?.canCode}
                     className={`size-8 p-0 hover:bg-accent ${editorState?.isCode
-                            ? "bg-accent text-accent-foreground"
-                            : "text-muted-foreground hover:text-foreground"
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     <Code className="h-4 w-4" />
@@ -372,6 +341,35 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
                 >
                     <AlignJustify className="h-4 w-4" />
                 </Button>
+
+
+                {/* Save Status */}
+                <div className="flex items-center gap-1.5 px-2 text-xs font-medium border-l ml-1">
+                    {saveStatus === "saving" && (
+                        <>
+                            <Loader2 className="h-3 w-3 animate-spin text-primary" />
+                            <span className="text-muted-foreground">Saving...</span>
+                        </>
+                    )}
+                    {saveStatus === "saved" && (
+                        <>
+                            <CheckCircle2 className="h-3 w-3 text-green-500" />
+                            <span className="text-green-500">Saved</span>
+                        </>
+                    )}
+                    {saveStatus === "error" && (
+                        <>
+                            <CloudOff className="h-3 w-3 text-destructive" />
+                            <span className="text-destructive">Error saving</span>
+                        </>
+                    )}
+                    {saveStatus === "idle" && !isPending && (
+                        <>
+                            <CloudUpload className="h-3 w-3 text-muted-foreground/50" />
+                            <span className="text-muted-foreground/50">Up to date</span>
+                        </>
+                    )}
+                </div>
 
                 {/* Spacer */}
                 <div className="flex-1" />

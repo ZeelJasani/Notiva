@@ -3,6 +3,7 @@
 import { db } from "@/db/drizzle";
 import { InsertNote, notes } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 
 export const createNote = async (values: InsertNote) => {
     try {
@@ -32,9 +33,10 @@ export const getNoteById = async (id: string) => {
 export const updateNote = async (id: string, values: Partial<InsertNote>) => {
     try {
         await db.update(notes).set(values).where(eq(notes.id, id));
-        return { success: true, message: "Notebook updated successfully" };
+        revalidatePath("/dashboard/notebook");
+        return { success: true, message: "Note updated successfully" };
     } catch {
-        return { success: false, message: "Failed to update notebook" };
+        return { success: false, message: "Failed to update note" };
     }
 };
 

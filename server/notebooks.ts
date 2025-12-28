@@ -4,6 +4,7 @@ import { db } from "@/db/drizzle";
 import { InsertNotebook, notebooks } from "@/db/schema";
 import { auth } from "@/lib/auth";
 import { eq } from "drizzle-orm";
+import { revalidatePath } from "next/cache";
 import { headers } from "next/headers";
 
 export const createNotebook = async (values: InsertNotebook) => {
@@ -59,6 +60,7 @@ export const getNotebookById = async (id: string) => {
 export const updateNotebook = async (id: string, values: InsertNotebook) => {
     try {
         await db.update(notebooks).set(values).where(eq(notebooks.id, id));
+        revalidatePath("/dashboard");
         return { success: true, message: "Notebook updated successfully" };
     } catch {
         return { success: false, message: "Failed to update notebook" };
