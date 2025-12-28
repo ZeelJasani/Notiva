@@ -45,7 +45,7 @@ import {
 import { updateNote } from "@/server/notes";
 
 interface RichTextEditorProps {
-    content?: JSONContent[];
+    content?: JSONContent;
     noteId?: string;
 }
 
@@ -60,30 +60,6 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
         autofocus: true,
         editable: true,
         injectCSS: false,
-        onUpdate: ({ editor }) => {
-            if (noteId) {
-                setSaveStatus("saving");
-                if (timerRef.current) clearTimeout(timerRef.current);
-
-                const content = editor.getJSON();
-                timerRef.current = setTimeout(() => {
-                    startTransition(async () => {
-                        try {
-                            const result = await updateNote(noteId, { content });
-                            if (result.success) {
-                                setSaveStatus("saved");
-                                // Reset to idle after a while
-                                setTimeout(() => setSaveStatus("idle"), 2000);
-                            } else {
-                                setSaveStatus("error");
-                            }
-                        } catch {
-                            setSaveStatus("error");
-                        }
-                    });
-                }, 500); // 500ms for real-time feel
-            }
-        },
         content: content ?? {
             type: "doc",
             content: [],
@@ -91,10 +67,38 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
     });
 
     useEffect(() => {
+        if (!editor) return;
+
+        const handleUpdate = () => {
+            if (noteId) {
+                setSaveStatus("saving");
+                if (timerRef.current) clearTimeout(timerRef.current);
+
+                const json = editor.getJSON();
+                timerRef.current = setTimeout(() => {
+                    startTransition(async () => {
+                        try {
+                            const result = await updateNote(noteId, { content: json });
+                            if (result.success) {
+                                setSaveStatus("saved");
+                                setTimeout(() => setSaveStatus("idle"), 3000);
+                            } else {
+                                setSaveStatus("error");
+                            }
+                        } catch {
+                            setSaveStatus("error");
+                        }
+                    });
+                }, 300);
+            }
+        };
+
+        editor.on("update", handleUpdate);
         return () => {
+            editor.off("update", handleUpdate);
             if (timerRef.current) clearTimeout(timerRef.current);
         };
-    }, []);
+    }, [editor, noteId]);
 
     const editorState = useEditorState({
         editor,
@@ -344,7 +348,7 @@ const RichTextEditor = ({ content, noteId }: RichTextEditorProps) => {
 
 
                 {/* Save Status */}
-                <div className="flex items-center gap-1.5 px-2 text-xs font-medium border-l ml-1">
+                <div className="flex items-center gap-1.5 px-2.5 py-1 text-xs font-medium border rounded-full bg-muted/30 ml-2 min-w-[90px] justify-center transition-all duration-300">
                     {saveStatus === "saving" && (
                         <>
                             <Loader2 className="h-3 w-3 animate-spin text-primary" />

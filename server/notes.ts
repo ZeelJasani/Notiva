@@ -26,16 +26,18 @@ export const getNoteById = async (id: string) => {
 
         return { success: true, note };
     } catch {
-        return { success: false, message: "Failed to get notebook" };
+        return { success: false, message: "Failed to get note" };
     }
 };
 
 export const updateNote = async (id: string, values: Partial<InsertNote>) => {
     try {
+        if (!id) throw new Error("Note ID is required");
         await db.update(notes).set(values).where(eq(notes.id, id));
-        revalidatePath("/dashboard/notebook");
+        revalidatePath(`/dashboard/notebook`, "layout");
         return { success: true, message: "Note updated successfully" };
-    } catch {
+    } catch (error) {
+        console.error("Error updating note:", error);
         return { success: false, message: "Failed to update note" };
     }
 };

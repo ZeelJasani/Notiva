@@ -4,13 +4,14 @@ import { getNoteById } from "@/server/notes";
 import { JSONContent } from "@tiptap/react";
 
 type Params = Promise<{
-  noteId: string;
+  notebookid: string;
+  noteid: string;
 }>;
 
 export default async function NotePage({ params }: { params: Params }) {
-  const { noteId } = await params;
+  const { noteid } = await params;
 
-  const { note } = await getNoteById(noteId);
+  const { note } = await getNoteById(noteid);
 
   return (
     <PageWrapper
@@ -18,16 +19,18 @@ export default async function NotePage({ params }: { params: Params }) {
         { label: "Dashboard", href: "/dashboard" },
         {
           label: note?.notebook?.name ?? "Notebook",
-          href: `/dashboard/notebook/${note?.notebook?.id}`,
+          href: `/dashboard/notebook/${note?.notebookId}`,
         },
-        { label: note?.title ?? "Note", href: `/dashboard/note/${noteId}` },
+        { label: note?.title ?? "Note", href: `/dashboard/notebook/${note?.notebookId}/note/${noteid}` },
       ]}
     >
-      <h1>{note?.title}</h1>
-      <RichTextEditor
-        content={note?.content as JSONContent[]}
-        noteId={noteId}
-      />
+      <div className="flex flex-col gap-4">
+        <h1>{note?.title}</h1>
+        <RichTextEditor
+          content={note?.content as JSONContent}
+          noteId={noteid}
+        />
+      </div>
     </PageWrapper>
   );
 }
