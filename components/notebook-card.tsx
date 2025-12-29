@@ -21,11 +21,35 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import { Loader2, Trash2 } from "lucide-react";
-import { deleteNotebook } from "@/server/notebooks";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormLabel,
+  FormMessage,
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { useForm } from "react-hook-form";
+import { z } from "zod";
+import { Loader2, Trash2, Pencil } from "lucide-react";
+import { deleteNotebook, updateNotebook } from "@/server/notebooks";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+
+const formSchema = z.object({
+  name: z.string().min(2).max(50),
+});
 
 interface NotebookCardProps {
   notebook: Notebook;
@@ -35,7 +59,38 @@ export default function NotebookCard({ notebook }: NotebookCardProps) {
   const router = useRouter();
 
   const [isDeleting, setIsDeleting] = useState(false);
-  const [isOpen, setIsOpen] = useState(false);
+  const [isRenaming, setIsRenaming] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [isRenameDialogOpen, setIsRenameDialogOpen] = useState(false);
+
+  const form = useForm<z.infer<typeof formSchema>>({
+    resolver: zodResolver(formSchema),
+    defaultValues: {
+      name: notebook.name,
+    },
+  });
+
+  const handleRename = async (values: z.infer<typeof formSchema>) => {
+    try {
+      setIsRenaming(true);
+      const response = await updateNotebook(notebook.id, {
+        ...notebook,
+        name: values.name,
+      });
+
+      if (response.success) {
+        toast.success("Notebook renamed successfully");
+        router.refresh();
+        setIsRenameDialogOpen(false);
+      } else {
+        toast.error(response.message);
+      }
+    } catch {
+      toast.error("Failed to rename notebook");
+    } finally {
+      setIsRenaming(false);
+    }
+  };
 
   const handleDelete = async () => {
     try {
@@ -50,11 +105,11 @@ export default function NotebookCard({ notebook }: NotebookCardProps) {
       toast.error("Failed to delete notebook");
     } finally {
       setIsDeleting(false);
-      setIsOpen(false);
+      setIsDeleteDialogOpen(false);
     }
   };
   return (
-    <Card>
+    <Card className="group relative">
       <CardHeader>
         <CardTitle>{notebook.name}</CardTitle>
       </CardHeader>
@@ -66,9 +121,73 @@ export default function NotebookCard({ notebook }: NotebookCardProps) {
           <Button variant="outline">View</Button>
         </Link>
 
-        <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
+        <Dialog open={isRenameDialogOpen} onOpenChange={setIsRenameDialogOpen}>
+          <DialogTrigger asChild>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity"
+            >
+              <Pencil className="size-4" />
+            </Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Rename Notebook</DialogTitle>
+              <DialogDescription>
+                Enter a new name for your notebook.
+              </DialogDescription>
+            </DialogHeader>
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(handleRename)}
+                className="space-y-4"
+              >
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          onKeyDown={(e) => {
+                            if (e.key === " ") e.stopPropagation();
+                          }}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                <div className="flex justify-end gap-2">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => setIsRenameDialogOpen(false)}
+                  >
+                    Cancel
+                  </Button>
+                  <Button type="submit" disabled={isRenaming}>
+                    {isRenaming ? (
+                      <Loader2 className="size-4 animate-spin" />
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </Button>
+                </div>
+              </form>
+            </Form>
+          </DialogContent>
+        </Dialog>
+
+        <AlertDialog
+          open={isDeleteDialogOpen}
+          onOpenChange={setIsDeleteDialogOpen}
+        >
           <AlertDialogTrigger asChild>
-            <Button variant="destructive" disabled={isDeleting}>
+            <Button variant="destructive" size="icon" disabled={isDeleting}>
               {isDeleting ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (

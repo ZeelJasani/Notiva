@@ -4,6 +4,7 @@ import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { Button } from "./ui/button";
+import { cn } from "@/lib/utils";
 import {
   Dialog,
   DialogContent,
@@ -34,9 +35,11 @@ const formSchema = z.object({
 interface CreateNoteButtonProps {
   notebookId: string;
   parentId?: string;
+  iconOnly?: boolean;
+  className?: string;
 }
 
-export const CreateNoteButton = ({ notebookId, parentId }: CreateNoteButtonProps) => {
+export const CreateNoteButton = ({ notebookId, parentId, iconOnly, className }: CreateNoteButtonProps) => {
   const router = useRouter();
 
   const [isLoading, setIsLoading] = useState(false);
@@ -83,10 +86,24 @@ export const CreateNoteButton = ({ notebookId, parentId }: CreateNoteButtonProps
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button className="w-max" variant={parentId ? "outline" : "default"}>
-          <Plus className="mr-2 h-4 w-4" />
-          {parentId ? "Create Sub-page" : "Create Note"}
-        </Button>
+        {iconOnly ? (
+          <Button
+            variant="ghost"
+            size="icon"
+            className={cn("size-5 p-0", className)}
+            title={parentId ? "Create Sub-page" : "Create Note"}
+          >
+            <Plus className="size-3" />
+            <span className="sr-only">
+              {parentId ? "Create Sub-page" : "Create Note"}
+            </span>
+          </Button>
+        ) : (
+          <Button className="w-max" variant={parentId ? "outline" : "default"}>
+            <Plus className="mr-2 h-4 w-4" />
+            {parentId ? "Create Sub-page" : "Create Note"}
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
@@ -105,7 +122,15 @@ export const CreateNoteButton = ({ notebookId, parentId }: CreateNoteButtonProps
                 <FormItem>
                   <FormLabel>Title</FormLabel>
                   <FormControl>
-                    <Input placeholder="Note title" {...field} />
+                    <Input
+                      placeholder="Note title"
+                      {...field}
+                      onKeyDown={(e) => {
+                        if (e.key === " ") {
+                          e.stopPropagation();
+                        }
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

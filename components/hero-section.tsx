@@ -153,7 +153,7 @@ export default function HeroSection() {
                     alt="App preview"
                     width={2700}
                     height={1440}
-                    className="aspect-[15/8] rounded-xl border dark:hidden"
+                    className="aspect-15/8 rounded-xl border dark:hidden"
                     priority
                   />
                   <Image
@@ -161,7 +161,7 @@ export default function HeroSection() {
                     alt="App preview dark"
                     width={2700}
                     height={1440}
-                    className="hidden aspect-[15/8] rounded-xl dark:block"
+                    className="hidden aspect-15/8 rounded-xl dark:block"
                     priority
                   />
                 </div>

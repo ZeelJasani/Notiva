@@ -92,12 +92,77 @@ export const suggestion = {
                     editor.chain().focus().deleteRange(range).toggleCodeBlock().run();
                 },
             },
+            {
+                title: "Strike",
+                description: "Cross out text",
+                searchTerms: ["strike", "strikethrough", "cross"],
+                icon: "Strikethrough",
+                command: ({ editor, range }: any) => {
+                    editor.chain().focus().deleteRange(range).toggleStrike().run();
+                },
+            },
+            {
+                title: "Underline",
+                description: "Underline text",
+                searchTerms: ["underline", "line", "u"],
+                icon: "Underline",
+                command: ({ editor, range }: any) => {
+                    editor.chain().focus().deleteRange(range).toggleUnderline().run();
+                },
+            },
+            {
+                title: "Link",
+                description: "Add a hyperlink",
+                searchTerms: ["link", "url", "href"],
+                icon: "Link",
+                command: ({ editor, range }: any) => {
+                    const url = window.prompt("Enter URL");
+                    if (url) {
+                        editor.chain().focus().deleteRange(range).setLink({ href: url }).run();
+                    }
+                },
+            },
+            {
+                title: "Horizontal Rule",
+                description: "Insert a vertical divider",
+                searchTerms: ["horizontal", "rule", "divider", "line", "hr"],
+                icon: "Minus",
+                command: ({ editor, range }: any) => {
+                    editor.chain().focus().deleteRange(range).setHorizontalRule().run();
+                },
+            },
+            {
+                title: "Bold",
+                description: "Make text bold",
+                searchTerms: ["bold", "b", "strong"],
+                icon: "Bold",
+                command: ({ editor, range }: any) => {
+                    editor.chain().focus().deleteRange(range).toggleBold().run();
+                },
+            },
+            {
+                title: "Italic",
+                description: "Make text italic",
+                searchTerms: ["italic", "i", "em"],
+                icon: "Italic",
+                command: ({ editor, range }: any) => {
+                    editor.chain().focus().deleteRange(range).toggleItalic().run();
+                },
+            },
+            {
+                title: "Inline Code",
+                description: "Format as code snippet",
+                searchTerms: ["code", "inline", "monospaced"],
+                icon: "Code",
+                command: ({ editor, range }: any) => {
+                    editor.chain().focus().deleteRange(range).toggleCode().run();
+                },
+            },
         ]
             .filter((item) =>
                 item.title.toLowerCase().startsWith(query.toLowerCase()) ||
                 item.searchTerms.some((term) => term.startsWith(query.toLowerCase()))
-            )
-            .slice(0, 10);
+            );
     },
 
     render: () => {

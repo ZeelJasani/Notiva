@@ -13,10 +13,17 @@ import {
     CheckSquare,
     Quote,
     Code,
+    Strikethrough,
+    Underline,
+    Link,
+    Minus,
+    Bold,
+    Italic,
 } from "lucide-react";
 
 export const SlashCommandList = forwardRef((props: any, ref) => {
     const [selectedIndex, setSelectedIndex] = useState(0);
+    const containerRef = React.useRef<HTMLDivElement>(null);
 
     const selectItem = (index: number) => {
         const item = props.items[index];
@@ -49,8 +56,29 @@ export const SlashCommandList = forwardRef((props: any, ref) => {
     }));
 
     useEffect(() => {
+        // Reset selection when items change
         setSelectedIndex(0);
     }, [props.items]);
+
+    useEffect(() => {
+        if (selectedIndex !== -1 && containerRef.current) {
+            const container = containerRef.current;
+            const item = container.children[selectedIndex] as HTMLElement;
+
+            if (item) {
+                const containerTop = container.scrollTop;
+                const containerBottom = containerTop + container.offsetHeight;
+                const itemTop = item.offsetTop;
+                const itemBottom = itemTop + item.offsetHeight;
+
+                if (itemTop < containerTop) {
+                    container.scrollTop = itemTop;
+                } else if (itemBottom > containerBottom) {
+                    container.scrollTop = itemBottom - container.offsetHeight;
+                }
+            }
+        }
+    }, [selectedIndex]);
 
     const getIcon = (iconName: string) => {
         switch (iconName) {
@@ -70,13 +98,25 @@ export const SlashCommandList = forwardRef((props: any, ref) => {
                 return <Quote className="w-4 h-4" />;
             case "Code":
                 return <Code className="w-4 h-4" />;
+            case "Strikethrough":
+                return <Strikethrough className="w-4 h-4" />;
+            case "Underline":
+                return <Underline className="w-4 h-4" />;
+            case "Link":
+                return <Link className="w-4 h-4" />;
+            case "Minus":
+                return <Minus className="w-4 h-4" />;
+            case "Bold":
+                return <Bold className="w-4 h-4" />;
+            case "Italic":
+                return <Italic className="w-4 h-4" />;
             default:
                 return null;
         }
     };
 
     return (
-        <div className="z-50 h-auto max-h-[330px] w-72 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-md transition-all">
+        <div ref={containerRef} className="z-50 h-auto max-h-[330px] w-72 overflow-y-auto rounded-md border border-border bg-popover p-1 shadow-md transition-all">
             {props.items.length > 0 ? (
                 props.items.map((item: any, index: number) => (
                     <button
