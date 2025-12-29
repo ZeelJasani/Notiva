@@ -7,6 +7,8 @@ import React from 'react'
 import { cn } from '@/lib/utils'
 import { useScroll } from 'motion/react'
 import { ModeToggle } from './theme-toggle'
+import { authClient } from '@/lib/auth-client'
+import { UserNav } from './user-nav'
 
 const menuItems = [
     { name: 'Dashboard', href: '/dashboard' },
@@ -15,6 +17,7 @@ const menuItems = [
 export const HeroHeader = () => {
     const [menuState, setMenuState] = React.useState(false)
     const [scrolled, setScrolled] = React.useState(false)
+    const session = authClient.useSession()
 
     const { scrollYProgress } = useScroll()
 
@@ -79,21 +82,27 @@ export const HeroHeader = () => {
                             </div>
                             <ModeToggle />
                             <div className="flex w-full flex-col space-y-3 sm:flex-row sm:gap-3 sm:space-y-0 md:w-fit">
-                                <Button
-                                    asChild
-                                    variant="outline"
-                                    size="sm">
-                                    <Link href="/login">
-                                        <span>Login</span>
-                                    </Link>
-                                </Button>
-                                <Button
-                                    asChild
-                                    size="sm">
-                                    <Link href="/signup">
-                                        <span>Sign Up</span>
-                                    </Link>
-                                </Button>
+                                {session.data ? (
+                                    <UserNav />
+                                ) : (
+                                    <>
+                                        <Button
+                                            asChild
+                                            variant="outline"
+                                            size="sm">
+                                            <Link href="/login">
+                                                <span>Login</span>
+                                            </Link>
+                                        </Button>
+                                        <Button
+                                            asChild
+                                            size="sm">
+                                            <Link href="/signup">
+                                                <span>Sign Up</span>
+                                            </Link>
+                                        </Button>
+                                    </>
+                                )}
                             </div>
                         </div>
                     </div>

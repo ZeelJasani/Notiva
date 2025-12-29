@@ -1,3 +1,4 @@
+"use client";
 import React from "react"
 import Link from "next/link"
 import Image from "next/image"
@@ -6,6 +7,7 @@ import { ArrowRight, Zap, Keyboard, Code2, Layers, Star } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { AnimatedGroup } from "@/components/ui/animated-group"
 import { HeroHeader } from "./header"
+import { authClient } from "@/lib/auth-client"
 
 const transitionVariants = {
   item: {
@@ -28,6 +30,7 @@ const transitionVariants = {
 }
 
 export default function HeroSection() {
+  const session = authClient.useSession()
   return (
     <>
       <HeroHeader />
@@ -71,39 +74,41 @@ export default function HeroSection() {
                 </p>
 
                 {/* CTA */}
-                <AnimatedGroup
-                  className="mt-10 flex flex-wrap justify-center gap-4"
-                  variants={{
-                    container: {
-                      visible: {
-                        transition: {
-                          staggerChildren: 0.08,
-                          delayChildren: 0.75,
+                {!session.data && (
+                  <AnimatedGroup
+                    className="mt-10 flex flex-wrap justify-center gap-4"
+                    variants={{
+                      container: {
+                        visible: {
+                          transition: {
+                            staggerChildren: 0.08,
+                            delayChildren: 0.75,
+                          },
                         },
                       },
-                    },
-                    ...transitionVariants,
-                  }}
-                >
-                  <Button
-                    asChild
-                    size="lg"
-                    variant="outline"
-                    className="h-12 rounded-xl px-8 text-base font-semibold"
+                      ...transitionVariants,
+                    }}
                   >
-                    <Link href="/login">Sign In</Link>
-                  </Button>
+                    <Button
+                      asChild
+                      size="lg"
+                      variant="outline"
+                      className="h-12 rounded-xl px-8 text-base font-semibold"
+                    >
+                      <Link href="/login">Sign In</Link>
+                    </Button>
 
-                  <Button
-                    asChild
-                    size="lg"
-                    className="h-12 rounded-xl px-8 text-base font-semibold"
-                  >
-                    <Link href="/register" className="flex items-center gap-2">
-                      Start Writing <ArrowRight size={12} />
-                    </Link>
-                  </Button>
-                </AnimatedGroup>
+                    <Button
+                      asChild
+                      size="lg"
+                      className="h-12 rounded-xl px-8 text-base font-semibold"
+                    >
+                      <Link href="/register" className="flex items-center gap-2">
+                        Start Writing <ArrowRight size={12} />
+                      </Link>
+                    </Button>
+                  </AnimatedGroup>
+                )}
 
                 {/* Feature highlights */}
                 <div className="mt-16 flex flex-wrap justify-center gap-x-8 gap-y-4 text-sm font-medium text-muted-foreground/80">

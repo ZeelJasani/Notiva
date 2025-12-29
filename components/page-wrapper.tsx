@@ -1,6 +1,6 @@
 import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList, BreadcrumbSeparator, } from "@/components/ui/breadcrumb";
 import { SidebarTrigger } from "./ui/sidebar";
-import { Logout } from "./logout";
+import { UserNav } from "./user-nav";
 import { ModeToggle } from "./theme-toggle";
 import { Fragment } from "react";
 
@@ -40,7 +40,7 @@ export function PageWrapper({ children, breadcrumbs }: PageWrapperProps) {
 
           <div className="flex items-center gap-4">
             <ModeToggle />
-            <Logout />
+            <UserNav />
           </div>
         </div>
       </header>
