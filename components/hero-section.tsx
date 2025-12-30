@@ -67,8 +67,8 @@ export default function HeroSection() {
 
                 {/* Subtitle */}
                 <p className="mt-6 max-w-2xl text-pretty text-lg text-muted-foreground md:text-xl">
-                  A minimal, block-based editor with keyboard shortcuts, slash
-                  commands, and a developer-first design. Your thoughts,
+                  A minimal, block based editor with keyboard shortcuts, slash
+                  commands, and a developer first design. Your thoughts,
                   organized like code.
                 </p>
 

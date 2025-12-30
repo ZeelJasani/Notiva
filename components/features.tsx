@@ -6,7 +6,7 @@ export default function Features() {
     const features = [
         {
             title: "Block-based Editor",
-            description: "Write with blocks — headings, paragraphs, lists, code, quotes.",
+            description: "Write with blocks headings, paragraphs, lists, code, quotes.",
             category: "Writing",
             icon: <FileText className="size-5" />,
             tagBg: "bg-blue-500/10 border-blue-500/20",
@@ -59,7 +59,7 @@ export default function Features() {
             <div className="@container mx-auto max-w-6xl px-6">
                 <div className="text-center mb-16 md:mb-24">
                     <h2 className="text-balance text-4xl font-bold tracking-tight lg:text-5xl mb-4 text-foreground">Everything you need, nothing you don&apos;t</h2>
-                    <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Notiva combines the simplicity of text files with the power of a modern block-based editor.</p>
+                    <p className="text-muted-foreground text-lg max-w-2xl mx-auto">Notiva combines the simplicity of text files with the power of a modern block based editor.</p>
                 </div>
 
                 <div className="mx-auto grid gap-8 md:grid-cols-2 lg:grid-cols-3">
