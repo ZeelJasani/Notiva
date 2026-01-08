@@ -12,15 +12,20 @@ import {
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
+  SidebarGroupAction,
 } from "./ui/sidebar";
-import { ChevronRight, File } from "lucide-react";
+import { ChevronRight, FileText } from "lucide-react";
 import { useQueryState } from "nuqs";
+import { CreateNoteButton } from "./create-note-button";
+import { NoteActionMenu } from "./note-action-menu";
 
 interface SidebarDataProps {
   data: {
     navMain: {
+      id: string;
       title: string;
-      items: { title: string; url: string }[];
+      url: string;
+      items: { id: string; notebookId: string; title: string; url: string }[];
     }[];
   };
 }
@@ -52,7 +57,7 @@ export function SidebarData({ data }: SidebarDataProps) {
           <SidebarGroup>
             <SidebarGroupLabel
               asChild
-              className="group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm"
+              className="group/label text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground text-sm pr-8"
             >
               <CollapsibleTrigger>
                 {item.title}{" "}
@@ -61,17 +66,25 @@ export function SidebarData({ data }: SidebarDataProps) {
                 )}
               </CollapsibleTrigger>
             </SidebarGroupLabel>
+            <SidebarGroupAction asChild>
+              <CreateNoteButton
+                notebookId={item.id}
+                iconOnly
+                className="opacity-0 group-hover/collapsible:opacity-100 transition-opacity"
+              />
+            </SidebarGroupAction>
             <CollapsibleContent>
               <SidebarGroupContent>
                 <SidebarMenu>
-                  {item.items.map((item) => (
-                    <SidebarMenuItem key={item.title}>
+                  {item.items.map((note) => (
+                    <SidebarMenuItem key={note.id}>
                       <SidebarMenuButton asChild>
-                        <a href={item.url}>
-                          <File />
-                          {item.title}
+                        <a href={note.url}>
+                          <FileText className="size-4" />
+                          {note.title}
                         </a>
                       </SidebarMenuButton>
+                      <NoteActionMenu note={note} />
                     </SidebarMenuItem>
                   ))}
                 </SidebarMenu>

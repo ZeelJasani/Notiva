@@ -73,14 +73,23 @@ export const notes = pgTable("notes", {
     title: text('title').notNull(),
     content: jsonb('content').notNull(),
     notebookId: text('notebook_id').notNull().references(() => notebooks.id, { onDelete: 'cascade' }),
+    parentId: text('parent_id').references((): any => notes.id, { onDelete: 'cascade' }),
     createdAt: timestamp('created_at').$defaultFn(() => /* @__PURE__ */ new Date()),
     updatedAt: timestamp('updated_at').$defaultFn(() => /* @__PURE__ */ new Date())
 });
 
-export const noteRelations = relations(notes, ({ one }) => ({
+export const noteRelations = relations(notes, ({ one, many }) => ({
     notebook: one(notebooks, {
         fields: [notes.notebookId],
         references: [notebooks.id]
+    }),
+    parent: one(notes, {
+        fields: [notes.parentId],
+        references: [notes.id],
+        relationName: "nested_notes"
+    }),
+    children: many(notes, {
+        relationName: "nested_notes"
     })
 }));
 

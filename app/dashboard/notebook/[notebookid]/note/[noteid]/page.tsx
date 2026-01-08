@@ -24,12 +24,14 @@ export default async function NotePage({ params }: { params: Params }) {
         { label: note?.title ?? "Note", href: `/dashboard/notebook/${note?.notebookId}/note/${noteid}` },
       ]}
     >
-      <div className="flex flex-col gap-4">
-        <h1>{note?.title}</h1>
-        <RichTextEditor
-          content={note?.content as JSONContent}
-          noteId={noteid}
-        />
+      <div className="flex flex-col gap-8 min-w-0">
+        <div className="flex flex-col gap-4">
+          <h1 className="text-xl font-bold tracking-tight">{note?.title}</h1>
+          <RichTextEditor
+            content={note?.content as JSONContent}
+            noteId={noteid}
+          />
+        </div>
       </div>
     </PageWrapper>
   );

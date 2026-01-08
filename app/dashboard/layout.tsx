@@ -12,7 +12,7 @@ export default function DashboardLayout({
       <Suspense fallback={<div>Loading...</div>}>
         <AppSidebar />
       </Suspense>
-      <main className="flex-1">{children}</main>
+      <main className="flex-1 min-w-0">{children}</main>
     </SidebarProvider>
   );
 }

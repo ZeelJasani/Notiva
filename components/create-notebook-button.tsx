@@ -98,7 +98,15 @@ export const CreateNotebookButton = () => {
                 <FormItem>
                   <FormLabel>Name</FormLabel>
                   <FormControl>
-                    <Input placeholder="My Notebook" {...field} />
+                    <Input
+                      placeholder="My Notebook"
+                      {...field}
+                      onKeyDown={(e) => {
+                        if (e.key === " ") {
+                          e.stopPropagation();
+                        }
+                      }}
+                    />
                   </FormControl>
                   <FormMessage />
                 </FormItem>

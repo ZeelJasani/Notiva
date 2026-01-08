@@ -250,9 +250,12 @@ export async function AppSidebar({
     versions: ["1.0.1", "1.1.0-alpha", "2.0.0-beta1"],
     navMain: [
       ...(notebooks.notebooks?.map((notebook) => ({
+        id: notebook.id,
         title: notebook.name,
         url: `/dashboard/${notebook.id}`,
         items: notebook.notes.map((note) => ({
+          id: note.id,
+          notebookId: notebook.id,
           title: note.title,
           url: `/dashboard/notebook/${notebook.id}/note/${note.id}`,
         })),
