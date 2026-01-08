@@ -145,7 +145,7 @@ export default function HeroSection() {
                 item: itemVariants,
               }}
             >
-              <div className="relative mt-12 overflow-hidden px-2 sm:mt-20">
+              {/* <div className="relative mt-12 overflow-hidden px-2 sm:mt-20">
                 <div className="relative mx-auto max-w-5xl overflow-hidden rounded-2xl border bg-background p-4 shadow-lg ring-1 ring-border">
                   <Image
                     src="/notiva.webp"
@@ -163,6 +163,31 @@ export default function HeroSection() {
                     className="hidden aspect-15/8 rounded-xl dark:block"
                     priority
                   />
+                </div>
+              </div> */}
+              <div className="relative mt-8 overflow-hidden px-4 pb-16 sm:mt-12 sm:px-6 sm:pb-24 md:mt-20 md:pb-32">
+                <div className="bg-background relative mx-auto w-full max-w-5xl overflow-hidden rounded-xl sm:rounded-2xl">
+
+                  {/* Light mode */}
+                  <Image
+                    className="relative w-full rounded-xl object-cover dark:hidden sm:rounded-2xl"
+                    src="/notiva-dark.png"
+                    alt="app screen"
+                    width={2700}
+                    height={1440}
+                    priority
+                  />
+
+                  {/* Dark mode */}
+                  <Image
+                    className="relative hidden w-full rounded-xl object-cover dark:block sm:rounded-2xl"
+                    src="/notiva-light.png"
+                    alt="app screen"
+                    width={2700}
+                    height={1440}
+                    priority
+                  />
+
                 </div>
               </div>
             </AnimatedGroup>
